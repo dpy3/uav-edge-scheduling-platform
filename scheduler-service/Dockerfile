@@ -10,6 +10,7 @@ COPY requirements-api.txt ./
 RUN pip install --no-cache-dir -r requirements-api.txt
 
 COPY api.py baselines.py metrics.py problem.py solve_cpsat.py solve_ga.py ./
+COPY tests ./tests
 
 EXPOSE 8000
 
