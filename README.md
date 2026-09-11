@@ -80,7 +80,7 @@ p(i,j) = ceil(workload(i) / capacity(j)) + transmission(i,j)
 ## 测试
 
 ```bash
-docker compose run --rm scheduler-api pytest -q
+docker compose run --rm scheduler-api python -m pytest -q
 
 docker compose run --rm -v "${PWD}/backend/tests:/app/backend/tests" backend pytest tests/ -q
 docker compose build backend
