@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-09-11T18:17:32",
+  "source": "platform UI one-click comparison",
+  "time_limit_s": 5,
+  "runs": [
+    {
+      "n_tasks": 20,
+      "n_nodes": 4,
+      "seed": 42,
+      "methods": {
+        "greedy": {"makespan": 325, "wall_time_s": 0.000253, "status": "HEURISTIC"},
+        "lpt": {"makespan": 394, "wall_time_s": 0.000156, "status": "HEURISTIC"},
+        "ga": {"makespan": 319, "wall_time_s": 5.0, "status": "HEURISTIC"},
+        "cpsat": {"makespan": 297, "wall_time_s": 0.24, "status": "OPTIMAL"},
+        "business": {"makespan": 325, "wall_time_s": 0.000268, "status": "HEURISTIC"}
+      }
+    },
+    {
+      "n_tasks": 40,
+      "n_nodes": 5,
+      "seed": 7,
+      "methods": {
+        "greedy": {"makespan": 606, "wall_time_s": 0.000146, "status": "HEURISTIC"},
+        "lpt": {"makespan": 696, "wall_time_s": 0.000135, "status": "HEURISTIC"},
+        "ga": {"makespan": 666, "wall_time_s": 5.0, "status": "HEURISTIC"},
+        "cpsat": {"makespan": 573, "wall_time_s": 5.06, "status": "FEASIBLE"},
+        "business": {"makespan": 606, "wall_time_s": 0.000706, "status": "HEURISTIC"}
+      }
+    },
+    {
+      "n_tasks": 80,
+      "n_nodes": 8,
+      "seed": 21,
+      "methods": {
+        "greedy": {"makespan": 572, "wall_time_s": 0.000328, "status": "HEURISTIC"},
+        "lpt": {"makespan": 642, "wall_time_s": 0.000225, "status": "HEURISTIC"},
+        "ga": {"makespan": 677, "wall_time_s": 5.01, "status": "HEURISTIC"},
+        "cpsat": {"makespan": 747, "wall_time_s": 5.04, "status": "FEASIBLE"},
+        "business": {"makespan": 568, "wall_time_s": 0.000526, "status": "HEURISTIC"}
+      }
+    }
+  ],
+  "interpretation": "CP-SAT is globally optimal only when status is OPTIMAL. For larger instances the five-second budget produced FEASIBLE solutions; these must not be described as proven optima."
+}

@@ -85,6 +85,18 @@ python scheduler-service/run_extended_experiments.py --seeds 10 --budget 0.2 --b
 
 结果保存到 `scheduler-service/results/extended_experiments.json`。当前正式样例使用 10 个实例种子；扩大种子数量和时间预算后可用于论文最终表格。
 
+### 页面规模实验记录
+
+下面是通过平台“ 一键算法对比 ”页面实际运行并保存到历史记录的三组规模实验。所有方法使用同一随机实例，GA 和 CP-SAT 的时间上限为 5 秒。
+
+| 规模 | Greedy | LPT | GA | CP-SAT | 业务启发式 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 20 任务 × 4 节点 | 325 | 394 | 319 | 297（OPTIMAL） | 325 |
+| 40 任务 × 5 节点 | 606 | 696 | 666 | 573（FEASIBLE） | 606 |
+| 80 任务 × 8 节点 | 572 | 642 | 677 | 747（FEASIBLE） | 568 |
+
+原始记录见 [`scheduler-service/results/ui_scale_runs.json`](scheduler-service/results/ui_scale_runs.json)。`OPTIMAL` 表示 CP-SAT 已证明最优；`FEASIBLE` 只表示在时间预算内找到可行解，不能写成全局最优。结果反映了工程上的权衡：小规模问题适合精确求解，规模增大后需要在求解时间、启发式质量和业务目标之间取舍。
+
 ## 测试
 
 ```bash
