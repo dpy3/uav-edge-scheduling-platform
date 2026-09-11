@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     SENTRY_DSN: HttpUrl | None = None
     DATABASE_URL: PostgresDsn
+    # URL of the separately deployed optimization service.
+    SCHEDULER_SERVICE_URL: HttpUrl = "http://scheduler-api:8000"
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod

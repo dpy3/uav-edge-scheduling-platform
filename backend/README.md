@@ -25,6 +25,22 @@ $ uv run fastapi dev
 
 The API is available at `http://localhost:8000`, with automatic interactive docs at `http://localhost:8000/docs`.
 
+## Scheduling Service Adapter
+
+The authenticated `POST /api/v1/scheduling/runs` endpoint forwards a validated
+run request to the stateless UAV-edge scheduling service. Configure its base URL
+with `SCHEDULER_SERVICE_URL` (the default is `http://scheduler-api:8000` when
+both services share a Docker network). The adapter keeps user authentication in
+this application while allowing the optimization service to be deployed and
+scaled independently.
+
+After pulling this change into an existing deployment, apply the new database
+migration before using the scheduling page:
+
+```console
+$ uv run alembic upgrade head
+```
+
 ## General Workflow
 
 Run backend commands from `./backend/` with `uv run`. Make sure your editor uses the Python interpreter at `.venv/bin/python` in the project root.

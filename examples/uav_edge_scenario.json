@@ -1,0 +1,14 @@
+{
+  "source_name": "uav-field-trial.json",
+  "tasks": [
+    {"task_id": 1, "workload_mcycles": 180, "data_size_mb": 22, "release_time": 0, "deadline": 80, "priority": 5},
+    {"task_id": 2, "workload_mcycles": 95, "data_size_mb": 8, "release_time": 4, "deadline": 55, "priority": 3},
+    {"task_id": 3, "workload_mcycles": 240, "data_size_mb": 35, "release_time": 6, "deadline": 110, "priority": 4},
+    {"task_id": 4, "workload_mcycles": 70, "data_size_mb": 5, "release_time": 9, "deadline": 50, "priority": 2}
+  ],
+  "nodes": [
+    {"name": "uav-local", "compute_capacity": 1.5, "bandwidth_mbps": 1},
+    {"name": "edge-east", "compute_capacity": 8, "bandwidth_mbps": 25},
+    {"name": "edge-west", "compute_capacity": 12, "bandwidth_mbps": 18}
+  ]
+}

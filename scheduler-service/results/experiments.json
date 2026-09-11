@@ -1,0 +1,77 @@
+{
+  "20x4_s11": {
+    "cpsat": {
+      "status": "SolveStatus.OPTIMAL",
+      "makespan": 284,
+      "wall_time_s": 0.34
+    },
+    "ga_best": 295,
+    "ga_avg": 308,
+    "ga_time_s": 30.0,
+    "baselines": {
+      "random": 460,
+      "greedy_earliest_finish": 308,
+      "lpt": 375
+    }
+  },
+  "40x5_s7": {
+    "cpsat": {
+      "status": "SolveStatus.FEASIBLE",
+      "makespan": 559,
+      "wall_time_s": 60.24
+    },
+    "ga_best": 652,
+    "ga_avg": 669,
+    "ga_time_s": 30.02,
+    "baselines": {
+      "random": 1034,
+      "greedy_earliest_finish": 606,
+      "lpt": 696
+    }
+  },
+  "80x8_s21": {
+    "cpsat": {
+      "status": "SolveStatus.FEASIBLE",
+      "makespan": 526,
+      "wall_time_s": 60.39
+    },
+    "ga_best": 649,
+    "ga_avg": 676,
+    "ga_time_s": 30.03,
+    "baselines": {
+      "random": 765,
+      "greedy_earliest_finish": 572,
+      "lpt": 642
+    }
+  },
+  "150x10_s33": {
+    "cpsat": {
+      "status": "SolveStatus.FEASIBLE",
+      "makespan": 777,
+      "wall_time_s": 60.68
+    },
+    "ga_best": 1057,
+    "ga_avg": 1077,
+    "ga_time_s": 30.03,
+    "baselines": {
+      "random": 1372,
+      "greedy_earliest_finish": 799,
+      "lpt": 990
+    }
+  },
+  "300x12_s55": {
+    "cpsat": {
+      "status": "SolveStatus.FEASIBLE",
+      "makespan": 1235,
+      "wall_time_s": 61.27
+    },
+    "ga_best": 1714,
+    "ga_avg": 1791,
+    "ga_time_s": 30.05,
+    "baselines": {
+      "random": 1991,
+      "greedy_earliest_finish": 1266,
+      "lpt": 1584
+    }
+  }
+}

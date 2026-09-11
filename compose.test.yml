@@ -1,0 +1,16 @@
+services:
+  db:
+    environment:
+      POSTGRES_DB: app_test
+    volumes:
+      - app-test-db-data:/var/lib/postgresql
+
+  backend:
+    environment:
+      FASTAPI_ENV: development
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Variable not set}@db:5432/app_test
+      FIRST_SUPERUSER: test-admin@example.com
+      FIRST_SUPERUSER_PASSWORD: test-only-password
+
+volumes:
+  app-test-db-data:

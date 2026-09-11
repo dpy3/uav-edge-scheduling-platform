@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_layout/")({
   head: () => ({
     meta: [
       {
-        title: "Dashboard - FastAPI Template",
+        title: "概览 - UAV Edge Scheduling",
       },
     ],
   }),
@@ -20,10 +20,10 @@ function Dashboard() {
     <div>
       <div>
         <h1 className="text-2xl truncate max-w-sm">
-          Hi, {currentUser?.full_name || currentUser?.email} 👋
+          欢迎，{currentUser?.full_name || currentUser?.email}
         </h1>
         <p className="text-muted-foreground">
-          Welcome back, nice to see you again!!!
+          在“调度运行”中导入场景、运行算法并保存实验结果。
         </p>
       </div>
     </div>

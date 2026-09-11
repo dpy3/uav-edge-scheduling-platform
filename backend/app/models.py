@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from pydantic import EmailStr
-from sqlalchemy import DateTime
+from sqlalchemy import JSON, Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -56,7 +56,7 @@ class User(UserBase, table=True):
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
     )
-    items: list[Item] = Relationship(back_populates="owner", cascade_delete=True)
+    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -109,6 +109,53 @@ class ItemPublic(ItemBase):
 
 class ItemsPublic(SQLModel):
     data: list[ItemPublic]
+    count: int
+
+
+class SchedulingRun(SQLModel, table=True):
+    """Persist one authenticated call to the optimization service."""
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE", index=True
+    )
+    method: str = Field(max_length=20, index=True)
+    status: str = Field(max_length=40)
+    n_tasks: int
+    n_nodes: int
+    seed: int
+    time_limit: float
+    makespan: int
+    wall_time_s: float
+    result_json: dict[str, object] = Field(
+        default_factory=dict,
+        sa_column=Column(JSON, nullable=False),
+    )
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+
+
+class SchedulingRunPublic(SQLModel):
+    id: uuid.UUID
+    owner_id: uuid.UUID
+    method: str
+    status: str
+    n_tasks: int
+    n_nodes: int
+    seed: int
+    time_limit: float
+    makespan: int
+    wall_time_s: float
+    tasks: list[dict[str, object]]
+    nodes: list[dict[str, object]] = Field(default_factory=list)
+    source_name: str = "generated"
+    created_at: datetime | None = None
+
+
+class SchedulingRunsPublic(SQLModel):
+    data: list[SchedulingRunPublic]
     count: int
 
 

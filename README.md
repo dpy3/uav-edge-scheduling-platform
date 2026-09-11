@@ -1,88 +1,118 @@
-# Full Stack FastAPI Template
+# UAV Edge Scheduling Platform
 
-[![Test Docker Compose](../../actions/workflows/test-docker-compose.yml/badge.svg)](../../actions/workflows/test-docker-compose.yml)
-[![Test Backend](../../actions/workflows/test-backend.yml/badge.svg)](../../actions/workflows/test-backend.yml)
+一个将无人机边缘计算任务调度算法服务化的全栈项目。系统支持上传任务场景，比较 Greedy、LPT、遗传算法（GA）与 CP-SAT 的调度效果，并保存每一次实验的任务分配、makespan、节点负载和求解时间。
 
-## Technology Stack and Features
+项目面向“优化算法 + 工程落地”的场景：无人机产生的目标识别、路径规划和传感器融合任务，可以在本地计算单元或异构边缘节点间卸载执行。
 
-- ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
-  - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).
-  - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
-  - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
-- 🚀 [React](https://react.dev) for the frontend.
-  - 🧩 Built into the backend application and served by FastAPI on the same domain as the API.
-  - 💃 Using TypeScript, hooks, [Vite](https://vitejs.dev), and other parts of a modern frontend stack.
-  - 🎨 [Tailwind CSS](https://tailwindcss.com) and [shadcn/ui](https://ui.shadcn.com) for the frontend components.
-  - 🤖 An automatically generated frontend client.
-  - 🧪 [Playwright](https://playwright.dev) for end-to-end testing.
-  - 🦇 Dark mode support.
-- ☁️ [FastAPI Cloud](https://fastapicloud.com) for deployment.
-- 🐋 [Docker Compose](https://www.docker.com) for local services and self-hosted deployment.
-  - 📞 [Traefik](https://traefik.io) as a reverse proxy with automatic HTTPS.
-- 🔒 Secure password hashing by default.
-- 🔑 JWT (JSON Web Token) authentication.
-- 📫 Email-based password recovery.
-- ✉️ [React Email](https://react.email) for email templates.
-- 📬 [Mailpit](https://mailpit.axllent.org) for local email testing during development.
-- ✅ Tests with [Pytest](https://pytest.org).
-- 🏭 CI (continuous integration) and CD (continuous deployment) based on GitHub Actions.
+## 能力
 
-### Dashboard Login
+- JSON / CSV 导入任务计算量、数据量、释放时间、截止时间、优先级，以及节点算力、带宽。
+- 同一输入场景下对比 Greedy、LPT、GA、CP-SAT，避免不同随机实例导致的无效比较。
+- 展示 makespan、算法耗时、节点负载和逐任务调度结果。
+- PostgreSQL 持久化运行记录，并按登录用户隔离历史数据。
+- FastAPI API、React 前端、独立调度求解器和 PostgreSQL 由 Docker Compose 编排。
 
-![Dashboard login screenshot](img/login.png)
+## 架构
 
-### Dashboard - Admin
+```mermaid
+flowchart LR
+  U[用户浏览器] --> F[React 调度工作台]
+  F -->|JWT / REST| A[FastAPI 平台 API]
+  A --> P[(PostgreSQL 运行记录)]
+  A -->|HTTP 场景与算法参数| S[UAV 调度求解服务]
+  S --> G[Greedy / LPT]
+  S --> H[遗传算法加局部搜索]
+  S --> C[PyJobShop / OR-Tools CP-SAT]
+```
 
-![Admin dashboard screenshot](img/dashboard.png)
+## 快速开始
 
-### Dashboard - Items
+需要 Docker Desktop（或 Docker Engine）与 Docker Compose。
 
-![Items dashboard screenshot](img/dashboard-items.png)
+```bash
+docker compose up -d --build
+```
 
-### Dashboard - Dark Mode
+打开 `http://127.0.0.1:8000`，本地开发账号：
 
-![Dark mode dashboard screenshot](img/dashboard-dark.png)
+```text
+email: admin@example.com
+password: local-development-password
+```
 
-### React Email Templates
+登录后进入 `/scheduling`。上传 `examples/uav_edge_scenario.json` 或 `examples/uav_edge_scenario.csv`，再点击“开始调度”或“一键算法对比”。
 
-![Email templates screenshot](img/react-email.png)
+| 服务 | 地址 |
+| --- | --- |
+| 平台前端与 API | `http://127.0.0.1:8000` |
+| API 文档 | `http://127.0.0.1:8000/docs` |
+| 调度求解服务 | `http://127.0.0.1:8011/docs` |
+| PostgreSQL | `localhost:5432` |
 
-### Mailpit - Local Email Testing
+## 任务模型
 
-![Mailpit screenshot](img/mailpit.png)
+任务字段：计算量 `workload_mcycles`、输入数据量 `data_size_mb`、释放时间 `release_time`、截止时间 `deadline`、优先级 `priority`。节点字段：算力 `compute_capacity`、带宽 `bandwidth_mbps`。
 
-### Interactive API Documentation
+```text
+p(i,j) = ceil(workload(i) / capacity(j)) + transmission(i,j)
+```
 
-![API docs](img/docs.png)
+本地节点不计算传输开销；边缘节点的传输开销由数据量与带宽计算。优化目标是最小化全部任务完成的最大时刻（makespan）。CSV 使用一张表，以 `record_type` 区分 `task` 与 `node` 行，完整样例见 `examples/uav_edge_scenario.csv`。
 
-## How to Use It
+## API
 
-Click the **Use this template** button at the top of this page to create a new repository.
+调度接口均需要 Bearer Token。
 
-## Backend Development
+| 方法 | 路径 | 用途 |
+| --- | --- | --- |
+| `POST` | `/api/v1/scheduling/import` | 解析 JSON / CSV 场景文件 |
+| `POST` | `/api/v1/scheduling/runs` | 运行一种算法并保存结果 |
+| `POST` | `/api/v1/scheduling/compare` | 用同一场景批量运行多种算法 |
+| `GET` | `/api/v1/scheduling/runs` | 查询当前用户历史实验 |
 
-Backend docs: [backend/README.md](./backend/README.md).
+## 实验复现建议
 
-## Frontend Development
+1. 导入样例场景，分别运行四种算法并保存结果。
+2. 保持场景与随机种子不变，对比 makespan 和求解耗时。
+3. 分别测试 20、50、100 个任务和 2、4、8 个边缘节点。
+4. 在报告中区分“精确求解最优值”和“元启发式近似值”，不要将一次随机结果表述为普遍结论。
 
-Frontend docs: [frontend/README.md](./frontend/README.md).
+## 测试
 
-## Deployment
+```bash
+docker compose run --rm scheduler-api pytest -q
 
-FastAPI Cloud deployment: [deployment.md](./deployment.md).
+docker compose run --rm -v "${PWD}/backend/tests:/app/backend/tests" backend pytest tests/ -q
+docker compose build backend
+```
 
-Self-hosted deployment with Docker Compose: [deployment-docker-compose.md](./deployment-docker-compose.md).
+## 生产部署
 
-## Development
+生产环境使用 Traefik 自动签发 HTTPS 证书。不要将本地 `.env` 中的开发密码带到服务器。
 
-General development docs: [development.md](./development.md).
+```bash
+export DOMAIN=your-domain.example
+export PROJECT_NAME="UAV Edge Scheduling Platform"
+export FIRST_SUPERUSER=admin@your-domain.example
+export POSTGRES_PASSWORD="replace-with-a-long-random-value"
+export SECRET_KEY="replace-with-a-long-random-value"
+export FIRST_SUPERUSER_PASSWORD="replace-with-a-long-random-value"
 
-This includes the local FastAPI and Vite workflow, Docker Compose services, `.env` configuration, and more.
+docker compose -f compose.yml -f compose.deploy.yml build
+docker compose -f compose.yml -f compose.deploy.yml run --rm backend bash scripts/prestart.sh
+docker compose -f compose.yml -f compose.deploy.yml up -d
+```
 
-## Release Notes
+生产配置默认不启动 Adminer；仅维护时附加 `--profile admin`。详情见 [deployment-docker-compose.md](deployment-docker-compose.md)。
 
-Check the file [release-notes.md](./release-notes.md).
+## GitHub 发布前检查
 
-## License
+- 修改 `.env` 中的开发密钥，并确认 `.env` 没有被提交。
+- 上传调度页面截图和一组可复现实验结果，不上传数据库卷和真实敏感数据。
+- 使用本项目名称与 README，删除原模板名称、演示 Items 描述和无关截图。
+- 运行测试、构建镜像后再推送到自己的 GitHub 仓库。
+- 调度服务源码位于 `scheduler-service/`，克隆仓库后不再依赖外部目录。
 
-The Full Stack FastAPI Template is licensed under the terms of the MIT license.
+## 技术栈
+
+Python 3.13、FastAPI、SQLModel、PostgreSQL、React、TypeScript、TanStack Query、Docker Compose、PyJobShop / OR-Tools、遗传算法。

@@ -31,6 +31,18 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Variable not set}
       - POSTGRES_DB=app
 
+  scheduler-api:
+    build:
+      context: ./scheduler-service
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 5
+
   adminer:
     image: adminer
     depends_on:
@@ -52,6 +64,9 @@ services:
       db:
         condition: service_healthy
         restart: true
+      scheduler-api:
+        condition: service_healthy
+        restart: true
     environment:
       PROJECT_NAME: ${PROJECT_NAME:?Variable not set}
       SECRET_KEY: ${SECRET_KEY:?Variable not set}
@@ -62,10 +77,11 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       EMAILS_FROM_EMAIL: ${EMAILS_FROM_EMAIL}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Variable not set}@db:5432/app
+      SCHEDULER_SERVICE_URL: http://scheduler-api:8000
       SENTRY_DSN: ${SENTRY_DSN:-}
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/utils/health-check/')"]
       interval: 10s
       timeout: 5s
       retries: 5

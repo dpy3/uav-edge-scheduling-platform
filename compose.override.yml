@@ -27,6 +27,10 @@ services:
     ports:
       - "5432:5432"
 
+  scheduler-api:
+    ports:
+      - "8011:8000"
+
   adminer:
     ports:
       - "8080:8080"
@@ -64,6 +68,8 @@ services:
       - ./backend/htmlcov:/app/backend/htmlcov
     environment:
       FASTAPI_ENV: "development"
+      SECRET_KEY: "local-development-secret-key-please-change"
+      FIRST_SUPERUSER_PASSWORD: "local-development-password"
       SMTP_HOST: "mailpit"
       SMTP_PORT: "1025"
       SMTP_TLS: "false"

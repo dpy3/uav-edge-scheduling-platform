@@ -16,7 +16,7 @@ ARG VITE_API_URL=
 RUN bun run build
 
 
-FROM python:3.14
+FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1
 

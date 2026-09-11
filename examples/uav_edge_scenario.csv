@@ -1,0 +1,8 @@
+record_type,task_id,workload_mcycles,data_size_mb,release_time,deadline,priority,name,compute_capacity,bandwidth_mbps
+task,1,180,22,0,80,5,,,
+task,2,95,8,4,55,3,,,
+task,3,240,35,6,110,4,,,
+task,4,70,5,9,50,2,,,
+node,,,,,,,uav-local,1.5,1
+node,,,,,,,edge-east,8,25
+node,,,,,,,edge-west,12,18

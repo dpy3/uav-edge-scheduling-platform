@@ -34,8 +34,17 @@ services:
   db:
     restart: always
 
+  scheduler-api:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
   adminer:
     restart: always
+    profiles: ["admin"]
     labels:
       # Route HTTPS traffic for the Adminer subdomain
       - traefik.http.routers.adminer-https.rule=Host(`adminer.${DOMAIN:?Variable not set}`)
@@ -48,6 +57,11 @@ services:
     restart: always
     environment:
       FRONTEND_HOST: https://${DOMAIN:?Variable not set}
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
     labels:
       # Route HTTPS traffic for this domain
       - traefik.http.routers.backend-https.rule=Host(`${DOMAIN:?Variable not set}`)
