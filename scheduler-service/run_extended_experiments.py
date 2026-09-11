@@ -99,33 +99,38 @@ def ablation(n_tasks: int, n_nodes: int, budget: float, seed: int) -> list[dict]
 
 def sensitivity(seed: int, budget: float) -> list[dict]:
     rows = []
-    for data_scale in (0.5, 1.0, 2.0):
-        for capacity_scale in (0.7, 1.0, 1.4):
-            for bandwidth_scale in (0.5, 1.0, 2.0):
-                base = generate_instance(n_tasks=30, n_nodes=5, seed=seed)
-                inst = deepcopy(base)
-                workloads = np.array([x["workload_mcycles"] for x in inst.task_metadata])
-                data_sizes = np.array([x["data_size_mb"] for x in inst.task_metadata]) * data_scale
-                capacities = np.asarray(inst.node_capacities) * capacity_scale
-                compute = np.ceil(workloads[:, None] / capacities[None, :]).astype(int)
-                duration = compute.copy()
-                if inst.n_nodes > 1:
-                    base_edge_tx = np.maximum(base.duration[:, 1:] - compute[:, 1:], 0)
-                    duration[:, 1:] += np.ceil(base_edge_tx / bandwidth_scale).astype(int)
-                inst.duration = np.maximum(1, duration)
-                for i, metadata in enumerate(inst.task_metadata):
-                    metadata["data_size_mb"] = float(data_sizes[i])
-                    metadata["priority"] = int(np.clip(metadata["priority"] * (0.5 + 0.5 * data_scale), 1, 10))
-                result = _ga(inst, 900, budget)
-                business = business_aware_schedule(inst)
-                business_metrics = _deadline_metrics(inst, business)
-                rows.append({"data_scale": data_scale, "capacity_scale": capacity_scale,
-                             "bandwidth_scale": bandwidth_scale,
-                             "makespan": result["makespan"], "load_std": result["load_std"],
-                             "deadline_violations": result["deadline_violations"],
-                             "business_makespan": business["makespan"],
-                             "business_deadline_violations": business_metrics["deadline_violations"],
-                             "business_weighted_lateness": business_metrics["weighted_lateness"]})
+    for priority_scale in (0.5, 1.0, 1.5):
+        for data_scale in (0.5, 1.0, 2.0):
+            for capacity_scale in (0.7, 1.0, 1.4):
+                for bandwidth_scale in (0.5, 1.0, 2.0):
+                    base = generate_instance(n_tasks=30, n_nodes=5, seed=seed)
+                    inst = deepcopy(base)
+                    workloads = np.array([x["workload_mcycles"] for x in inst.task_metadata])
+                    data_sizes = np.array([x["data_size_mb"] for x in inst.task_metadata]) * data_scale
+                    base_capacities = np.asarray(base.node_capacities)
+                    capacities = base_capacities * capacity_scale
+                    base_compute = np.ceil(workloads[:, None] / base_capacities[None, :]).astype(int)
+                    compute = np.ceil(workloads[:, None] / capacities[None, :]).astype(int)
+                    duration = compute.copy()
+                    if inst.n_nodes > 1:
+                        # Keep the generated network conditions as the reference and
+                        # scale transfer time by data volume and available bandwidth.
+                        base_edge_tx = np.maximum(base.duration[:, 1:] - base_compute[:, 1:], 0)
+                        duration[:, 1:] += np.ceil(base_edge_tx * data_scale / bandwidth_scale).astype(int)
+                    inst.duration = np.maximum(1, duration)
+                    for i, metadata in enumerate(inst.task_metadata):
+                        metadata["data_size_mb"] = float(data_sizes[i])
+                        metadata["priority"] = int(np.clip(round(metadata["priority"] * priority_scale), 1, 10))
+                    result = _ga(inst, 900, budget)
+                    business = business_aware_schedule(inst)
+                    business_metrics = _deadline_metrics(inst, business)
+                    rows.append({"priority_scale": priority_scale, "data_scale": data_scale, "capacity_scale": capacity_scale,
+                                 "bandwidth_scale": bandwidth_scale,
+                                 "makespan": result["makespan"], "load_std": result["load_std"],
+                                 "deadline_violations": result["deadline_violations"],
+                                 "business_makespan": business["makespan"],
+                                 "business_deadline_violations": business_metrics["deadline_violations"],
+                                 "business_weighted_lateness": business_metrics["weighted_lateness"]})
     return rows
 
 
