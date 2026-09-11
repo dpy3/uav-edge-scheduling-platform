@@ -34,6 +34,7 @@ services:
   scheduler-api:
     build:
       context: ./scheduler-service
+    working_dir: /app
     expose:
       - "8000"
     healthcheck:
