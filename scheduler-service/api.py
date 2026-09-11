@@ -18,7 +18,7 @@ from solve_cpsat import solve_instance
 from solve_ga import GeneticScheduler
 
 
-Method = Literal["greedy", "lpt", "ga", "cpsat"]
+Method = Literal["greedy", "lpt", "ga", "cpsat", "business"]
 
 
 class EdgeTask(BaseModel):
@@ -107,6 +107,9 @@ def _solve(request: ScheduleRequest):
         return instance, greedy_earliest_finish(instance)
     if request.method == "lpt":
         return instance, lpt_schedule(instance)
+    if request.method == "business":
+        from baselines import business_aware_schedule
+        return instance, business_aware_schedule(instance)
     if request.method == "ga":
         return instance, GeneticScheduler(instance, seed=request.seed).solve(
             time_limit=request.time_limit,

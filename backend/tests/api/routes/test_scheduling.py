@@ -94,6 +94,34 @@ def test_compare_scheduling_methods_persists_each_result(
     assert [run["method"] for run in result.json()] == ["greedy", "lpt"]
 
 
+def test_compare_accepts_business_aware_method(
+    client: TestClient,
+    superuser_token_headers: dict[str, str],
+    monkeypatch,
+) -> None:
+    payload = {
+        "status": "HEURISTIC", "makespan": 100, "wall_time_s": 0.01,
+        "n_tasks": 3, "n_nodes": 2, "seed": 7, "tasks": [], "nodes": [],
+        "source_name": "generated",
+    }
+
+    def fake_client(**_: object) -> FakeAsyncClient:
+        return FakeAsyncClient(httpx.Response(
+            status_code=200, json=payload,
+            request=httpx.Request("POST", "http://scheduler-api:8000/schedule"),
+        ))
+
+    monkeypatch.setattr(scheduling.httpx, "AsyncClient", fake_client)
+    result = client.post(
+        f"{settings.API_V1_STR}/scheduling/compare",
+        headers=superuser_token_headers,
+        json={"n_tasks": 3, "n_nodes": 2, "seed": 7, "methods": ["greedy", "business"]},
+    )
+
+    assert result.status_code == 200
+    assert [run["method"] for run in result.json()] == ["greedy", "business"]
+
+
 def test_import_json_scenario(
     client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:

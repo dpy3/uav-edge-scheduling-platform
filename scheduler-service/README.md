@@ -22,7 +22,7 @@
 | `problem.py` | 问题建模与可复现随机实例生成器（计算量/算力/传输延迟/释放时间） |
 | `solve_cpsat.py` | 精确求解基线：PyJobShop 建模（job=任务、machine=节点、mode=节点上的加工） |
 | `solve_ga.py` | 自实现混合遗传算法：双段染色体（节点分配+任务顺序）、OX 交叉、memetic 局部搜索 |
-| `baselines.py` | 随机、最早完成时间、LPT 三类轻量基线 |
+| `baselines.py` | 随机、最早完成时间、LPT、优先级/截止时间感知四类轻量基线 |
 | `metrics.py` | gap、均值、标准差等统一指标 |
 | `run_experiments.py` | 多规模对比实验，输出量化结果表、收敛曲线、甘特图 |
 | `run_extended_experiments.py` | 多随机种子、统一时间预算、GA 消融、业务敏感性、动态调度演示 |
@@ -47,8 +47,9 @@ python -m venv .venv
 
 ## 调度 API
 
-项目提供一个无状态 FastAPI 服务，当前支持 `greedy`、`lpt`、`ga` 和
-`cpsat` 四种求解方式。先安装 API 依赖：
+项目提供一个无状态 FastAPI 服务，当前支持 `greedy`、`lpt`、`business`、`ga` 和
+`cpsat` 五种求解方式。`business` 会在任务排序和节点选择时考虑优先级、截止时间
+以及预计迟延，适合业务指标对比；它不替代以 makespan 为目标的传统基线。先安装 API 依赖：
 
 ```bash
 ..\PyJobShop\.venv\Scripts\python.exe -m pip install -r requirements-api.txt

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from baselines import greedy_earliest_finish, lpt_schedule, random_schedule
+from baselines import business_aware_schedule, greedy_earliest_finish, lpt_schedule, random_schedule
 from metrics import relative_gap, summarize_runs
 from problem import generate_instance
 
@@ -20,6 +20,7 @@ def test_baselines_return_valid_schedules():
         random_schedule(inst, seed=7),
         greedy_earliest_finish(inst),
         lpt_schedule(inst),
+        business_aware_schedule(inst),
     ]:
         _assert_valid_result(result, inst.n_tasks)
         assert all(0 <= node < inst.n_nodes for node in result["node"])
@@ -42,3 +43,11 @@ def test_metrics_report_variability_and_gap():
     assert summary["average"] == 12
     assert summary["gap_pct"] == 25
     assert relative_gap(10, 8) == 25
+
+
+def test_business_aware_schedule_prioritizes_urgent_tasks_without_invalid_nodes():
+    inst = generate_instance(n_tasks=10, n_nodes=3, seed=17)
+    result = business_aware_schedule(inst)
+    _assert_valid_result(result, inst.n_tasks)
+    assert result["method"] == "business_aware"
+    assert all(0 <= node < inst.n_nodes for node in result["node"])

@@ -17,7 +17,7 @@ from app.models import SchedulingRun, SchedulingRunPublic, SchedulingRunsPublic
 
 router = APIRouter(prefix="/scheduling", tags=["scheduling"])
 
-SchedulingMethod = Literal["greedy", "lpt", "ga", "cpsat"]
+SchedulingMethod = Literal["greedy", "lpt", "ga", "cpsat", "business"]
 
 
 class EdgeTask(BaseModel):
@@ -46,7 +46,7 @@ class ComparisonRequest(BaseModel):
     n_nodes: int = Field(default=4, ge=1, le=32)
     seed: int = Field(default=42, ge=0)
     methods: list[SchedulingMethod] = Field(
-        default=["greedy", "lpt", "ga", "cpsat"], min_length=2, max_length=4
+        default=["greedy", "lpt", "ga", "cpsat", "business"], min_length=2, max_length=5
     )
     time_limit: float = Field(default=5.0, gt=0, le=60)
     scenario: SchedulingScenario | None = None

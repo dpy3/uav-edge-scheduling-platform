@@ -28,6 +28,17 @@ def test_schedule_endpoint_returns_task_records():
     assert all(task["end_time"] >= task["start_time"] for task in body["tasks"])
 
 
+def test_schedule_accepts_business_aware_method():
+    response = client.post(
+        "/schedule",
+        json={"n_tasks": 6, "n_nodes": 3, "seed": 12, "method": "business"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["method"] == "business"
+    assert body["makespan"] > 0
+
+
 def test_schedule_rejects_out_of_range_request():
     response = client.post("/schedule", json={"n_tasks": 0})
     assert response.status_code == 422

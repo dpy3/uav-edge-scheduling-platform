@@ -1,6 +1,6 @@
 import { client } from "@/client/client.gen"
 
-export type SchedulingMethod = "greedy" | "lpt" | "ga" | "cpsat"
+export type SchedulingMethod = "greedy" | "lpt" | "ga" | "cpsat" | "business"
 
 export type SchedulingTask = {
   task_id: number

@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_layout/scheduling")({
   head: () => ({ meta: [{ title: "UAV Edge Scheduling" }] }),
 })
 
-const methodLabels: Record<SchedulingMethod, string> = { greedy: "Greedy earliest finish", lpt: "Longest processing time", ga: "Genetic algorithm", cpsat: "CP-SAT exact solver" }
+const methodLabels: Record<SchedulingMethod, string> = { greedy: "Greedy earliest finish", lpt: "Longest processing time", ga: "Genetic algorithm", cpsat: "CP-SAT exact solver", business: "Priority/deadline aware" }
 
 function Scheduling() {
   const queryClient = useQueryClient()
@@ -55,7 +55,7 @@ function Scheduling() {
   }, [latestRun])
   const requestBase = { n_nodes: nNodes, n_tasks: nTasks, seed, time_limit: timeLimit, scenario }
   const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); runMutation.mutate({ ...requestBase, method }) }
-  const compare = () => compareMutation.mutate({ ...requestBase, methods: ["greedy", "lpt", "ga", "cpsat"] })
+  const compare = () => compareMutation.mutate({ ...requestBase, methods: ["greedy", "lpt", "ga", "cpsat", "business"] })
   const importFile = async (file?: File) => {
     if (!file) return
     try {
