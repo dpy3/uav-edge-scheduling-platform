@@ -26,6 +26,7 @@
 | `metrics.py` | gap、均值、标准差等统一指标 |
 | `run_experiments.py` | 多规模对比实验，输出量化结果表、收敛曲线、甘特图 |
 | `run_extended_experiments.py` | 多随机种子、统一时间预算、GA 消融、业务敏感性、动态调度演示 |
+| `advanced.py` | 节点故障后的快速重调度与多目标评分函数 |
 | `tests/` | 实例生成、解码器、基线和指标测试 |
 
 （原求解器以依赖方式安装，未修改上游源码。）
@@ -98,6 +99,9 @@ python run_extended_experiments.py --seeds 5 --budget 0.15
 - 数据量/算力缩放敏感性，以及截止期违约、加权迟延、负载标准差；
 - 动态任务到达和节点故障的重调度统计；
 - 多目标评分公式（makespan、迟延、负载均衡），当前作为扩展接口。
+
+程序化调用 `advanced.reschedule_after_node_failure` 可在节点离线后迁移受影响任务，
+`advanced.weighted_objective` 返回可解释的综合分数，便于后续接入在线 API 或将权重纳入 GA 适应度。
 
 默认结果用于验证流程和接口；正式论文结果应在固定硬件上提高种子数量和时间预算，并报告均值、标准差和置信区间。
 
