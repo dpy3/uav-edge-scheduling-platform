@@ -77,7 +77,7 @@ p(i,j) = ceil(workload(i) / capacity(j)) + transmission(i,j)
 3. 分别测试 20、50、100 个任务和 2、4、8 个边缘节点。
 4. 在报告中区分“精确求解最优值”和“元启发式近似值”，不要将一次随机结果表述为普遍结论。
 
-调度算法的扩展实验位于 `scheduler-service/`，可复现多随机种子、统一时间预算、GA 消融、资源敏感性和故障重调度：
+调度算法的扩展实验位于 `scheduler-service/`，可复现多随机种子、统一时间预算、GA 消融、数据量/算力/带宽资源敏感性和故障重调度：
 
 ```bash
 python scheduler-service/run_extended_experiments.py --seeds 10 --budget 0.2 --budgets 1,5,10,30

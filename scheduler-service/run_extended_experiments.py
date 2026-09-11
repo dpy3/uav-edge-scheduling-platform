@@ -14,7 +14,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from baselines import greedy_earliest_finish, lpt_schedule
+from baselines import business_aware_schedule, greedy_earliest_finish, lpt_schedule
 from problem import Instance, generate_instance
 from solve_ga import GeneticScheduler
 
@@ -52,9 +52,13 @@ def multi_seed(seeds: list[int], n_tasks: int, n_nodes: int, budget: float) -> d
         inst = generate_instance(n_tasks=n_tasks, n_nodes=n_nodes, seed=instance_seed)
         runs = [_ga(inst, 1000 + instance_seed * 10 + r, budget) for r in range(3)]
         vals = [r["makespan"] for r in runs]
+        business = business_aware_schedule(inst)
         rows.append({"instance_seed": instance_seed, "best": min(vals),
                      "mean": statistics.mean(vals), "median": statistics.median(vals),
-                     "std": statistics.pstdev(vals), "runs": len(vals)})
+                     "std": statistics.pstdev(vals), "runs": len(vals),
+                     "greedy": greedy_earliest_finish(inst)["makespan"],
+                     "business": business["makespan"],
+                     **{f"business_{k}": v for k, v in _deadline_metrics(inst, business).items()}})
     return {"seeds": seeds, "n_tasks": n_tasks, "n_nodes": n_nodes, "budget_s": budget, "rows": rows}
 
 
@@ -65,8 +69,12 @@ def time_budget(budgets: list[float], n_tasks: int, n_nodes: int, seed: int) -> 
         ga = _ga(inst, 77, budget)
         greedy = greedy_earliest_finish(inst)
         lpt = lpt_schedule(inst)
+        business = business_aware_schedule(inst)
         rows.append({"budget_s": budget, "ga": ga["makespan"],
                      "greedy": greedy["makespan"], "lpt": lpt["makespan"],
+                     "business": business["makespan"],
+                     "business_deadline_violations": _deadline_metrics(inst, business)["deadline_violations"],
+                     "business_weighted_lateness": _deadline_metrics(inst, business)["weighted_lateness"],
                      "ga_wall_time_s": ga["wall_time_s"]})
     return rows
 
@@ -93,13 +101,31 @@ def sensitivity(seed: int, budget: float) -> list[dict]:
     rows = []
     for data_scale in (0.5, 1.0, 2.0):
         for capacity_scale in (0.7, 1.0, 1.4):
-            base = generate_instance(n_tasks=30, n_nodes=5, seed=seed)
-            inst = deepcopy(base)
-            inst.duration = np.maximum(1, np.ceil(base.duration * data_scale / capacity_scale).astype(int))
-            result = _ga(inst, 900, budget)
-            rows.append({"data_scale": data_scale, "capacity_scale": capacity_scale,
-                         "makespan": result["makespan"], "load_std": result["load_std"],
-                         "deadline_violations": result["deadline_violations"]})
+            for bandwidth_scale in (0.5, 1.0, 2.0):
+                base = generate_instance(n_tasks=30, n_nodes=5, seed=seed)
+                inst = deepcopy(base)
+                workloads = np.array([x["workload_mcycles"] for x in inst.task_metadata])
+                data_sizes = np.array([x["data_size_mb"] for x in inst.task_metadata]) * data_scale
+                capacities = np.asarray(inst.node_capacities) * capacity_scale
+                compute = np.ceil(workloads[:, None] / capacities[None, :]).astype(int)
+                duration = compute.copy()
+                if inst.n_nodes > 1:
+                    base_edge_tx = np.maximum(base.duration[:, 1:] - compute[:, 1:], 0)
+                    duration[:, 1:] += np.ceil(base_edge_tx / bandwidth_scale).astype(int)
+                inst.duration = np.maximum(1, duration)
+                for i, metadata in enumerate(inst.task_metadata):
+                    metadata["data_size_mb"] = float(data_sizes[i])
+                    metadata["priority"] = int(np.clip(metadata["priority"] * (0.5 + 0.5 * data_scale), 1, 10))
+                result = _ga(inst, 900, budget)
+                business = business_aware_schedule(inst)
+                business_metrics = _deadline_metrics(inst, business)
+                rows.append({"data_scale": data_scale, "capacity_scale": capacity_scale,
+                             "bandwidth_scale": bandwidth_scale,
+                             "makespan": result["makespan"], "load_std": result["load_std"],
+                             "deadline_violations": result["deadline_violations"],
+                             "business_makespan": business["makespan"],
+                             "business_deadline_violations": business_metrics["deadline_violations"],
+                             "business_weighted_lateness": business_metrics["weighted_lateness"]})
     return rows
 
 

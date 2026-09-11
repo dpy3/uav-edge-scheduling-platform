@@ -94,10 +94,10 @@ python run_extended_experiments.py --seeds 5 --budget 0.15
 
 结果写入 `results/extended_experiments.json`，包含：
 
-- 多随机种子下 GA 的 best/mean/median/std；
-- 1×、2×、4×统一时间预算对比；
+- 10 个随机实例种子下 GA 的 best/mean/median/std，并附带 Greedy 与业务感知基线；
+- 1、5、10、30 秒统一时间预算对比；
 - 有无局部搜索、种群规模消融；
-- 数据量/算力缩放敏感性，以及截止期违约、加权迟延、负载标准差；
+- 数据量/算力/边缘带宽 3×3×3 敏感性，以及优先级加权的截止期违约、加权迟延、负载标准差；
 - 动态任务到达和节点故障的重调度统计；
 - 多目标评分公式（makespan、迟延、负载均衡），当前作为扩展接口。
 
