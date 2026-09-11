@@ -118,12 +118,15 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--seeds", type=int, default=5)
     p.add_argument("--budget", type=float, default=0.15)
+    p.add_argument("--budgets", default="", help="comma-separated time budgets for fairness experiment")
     args = p.parse_args()
     seeds = list(range(1, args.seeds + 1))
+    budgets = ([float(x) for x in args.budgets.split(",") if x.strip()]
+               if args.budgets else [args.budget, args.budget * 2, args.budget * 4])
     result = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "multi_seed": multi_seed(seeds, 30, 5, args.budget),
-        "time_budget": time_budget([args.budget, args.budget * 2, args.budget * 4], 30, 5, 7),
+        "time_budget": time_budget(budgets, 30, 5, 7),
         "ga_ablation": ablation(30, 5, args.budget, 7),
         "sensitivity": sensitivity(7, args.budget),
         "dynamic_demo": dynamic_demo(7, args.budget),
