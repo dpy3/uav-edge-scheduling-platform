@@ -44,8 +44,6 @@ export function User({ user }: { user: any }) {
   const { logout } = useAuth()
   const { isMobile, setOpenMobile } = useSidebar()
 
-  if (!user) return null
-
   const handleMenuClick = () => {
     if (isMobile) {
       setOpenMobile(false)
@@ -65,7 +63,10 @@ export function User({ user }: { user: any }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               data-testid="user-menu"
             >
-              <UserInfo fullName={user?.full_name} email={user?.email} />
+              <UserInfo
+                fullName={user?.full_name || "未加载用户"}
+                email={user?.email || "当前会话"}
+              />
               <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -76,15 +77,20 @@ export function User({ user }: { user: any }) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <UserInfo fullName={user?.full_name} email={user?.email} />
+              <UserInfo
+                fullName={user?.full_name || "未加载用户"}
+                email={user?.email || "当前会话"}
+              />
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <RouterLink to="/settings" onClick={handleMenuClick}>
-              <DropdownMenuItem>
-                <Settings />
-                User Settings
-              </DropdownMenuItem>
-            </RouterLink>
+            {user ? (
+              <RouterLink to="/settings" onClick={handleMenuClick}>
+                <DropdownMenuItem>
+                  <Settings />
+                  User Settings
+                </DropdownMenuItem>
+              </RouterLink>
+            ) : null}
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log Out

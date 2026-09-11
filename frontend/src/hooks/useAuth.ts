@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
+import { AxiosError } from "axios"
+import { useEffect } from "react"
 
 import {
   type Body_login_login_access_token as AccessToken,
@@ -20,11 +22,23 @@ const useAuth = () => {
   const queryClient = useQueryClient()
   const { showErrorToast } = useCustomToast()
 
-  const { data: user } = useQuery<UserPublic | null, Error>({
+  const currentUserQuery = useQuery<UserPublic | null, Error>({
     queryKey: ["currentUser"],
     queryFn: async () => (await UsersService.readUserMe()).data,
     enabled: isLoggedIn(),
+    retry: false,
   })
+  const { data: user } = currentUserQuery
+
+  useEffect(() => {
+    const error = currentUserQuery.error
+    const status = error instanceof AxiosError ? error.response?.status : undefined
+    if (status === 401 || status === 404) {
+      localStorage.removeItem("access_token")
+      queryClient.removeQueries({ queryKey: ["currentUser"] })
+      navigate({ to: "/login" })
+    }
+  }, [currentUserQuery.error, navigate, queryClient])
 
   const signUpMutation = useMutation({
     mutationFn: (data: UserRegister) =>
@@ -55,6 +69,7 @@ const useAuth = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token")
+    queryClient.clear()
     navigate({ to: "/login" })
   }
 
