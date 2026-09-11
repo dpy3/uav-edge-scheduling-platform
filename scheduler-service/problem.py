@@ -91,7 +91,7 @@ def instance_from_specs(
     names = [str(node.get("name", f"node-{i}")) for i, node in enumerate(nodes)]
     metadata = [
         {
-            "task_id": int(task.get("task_id", i)),
+            "task_id": int(task.get("task_id") if task.get("task_id") is not None else i),
             "priority": int(task.get("priority", 1)),
             "data_size_mb": float(data_sizes[i]),
             "deadline": int(task.get("deadline", release[i] + duration[i].min() * 2)),

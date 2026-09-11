@@ -1,0 +1,163 @@
+{
+  "generated_at": "2026-09-11T11:54:59",
+  "multi_seed": {
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "n_tasks": 30,
+    "n_nodes": 5,
+    "budget_s": 0.05,
+    "rows": [
+      {
+        "instance_seed": 1,
+        "best": 465,
+        "mean": 482,
+        "median": 481,
+        "std": 14.30617582258329,
+        "runs": 3
+      },
+      {
+        "instance_seed": 2,
+        "best": 365,
+        "mean": 376,
+        "median": 371,
+        "std": 11.575836902790225,
+        "runs": 3
+      },
+      {
+        "instance_seed": 3,
+        "best": 355,
+        "mean": 373,
+        "median": 366,
+        "std": 18.239152027072603,
+        "runs": 3
+      }
+    ]
+  },
+  "time_budget": [
+    {
+      "budget_s": 0.05,
+      "ga": 401,
+      "greedy": 338,
+      "lpt": 401,
+      "ga_wall_time_s": 0.06
+    },
+    {
+      "budget_s": 0.1,
+      "ga": 401,
+      "greedy": 338,
+      "lpt": 401,
+      "ga_wall_time_s": 0.11
+    },
+    {
+      "budget_s": 0.2,
+      "ga": 377,
+      "greedy": 338,
+      "lpt": 401,
+      "ga_wall_time_s": 0.21
+    }
+  ],
+  "ga_ablation": [
+    {
+      "config": "hybrid_ls",
+      "best": 395,
+      "mean": 405,
+      "std": 12.083045973594572
+    },
+    {
+      "config": "ga_no_local_search",
+      "best": 398,
+      "mean": 431.3333333333333,
+      "std": 23.921166824012207
+    },
+    {
+      "config": "small_population",
+      "best": 371,
+      "mean": 399,
+      "std": 26.19160170741759
+    },
+    {
+      "config": "large_population",
+      "best": 434,
+      "mean": 445,
+      "std": 10.98483803552272
+    }
+  ],
+  "sensitivity": [
+    {
+      "data_scale": 0.5,
+      "capacity_scale": 0.7,
+      "makespan": 337,
+      "load_std": 594.9273569100685,
+      "deadline_violations": 19
+    },
+    {
+      "data_scale": 0.5,
+      "capacity_scale": 1.0,
+      "makespan": 268,
+      "load_std": 452.9505050223479,
+      "deadline_violations": 14
+    },
+    {
+      "data_scale": 0.5,
+      "capacity_scale": 1.4,
+      "makespan": 233,
+      "load_std": 325.22792008067205,
+      "deadline_violations": 9
+    },
+    {
+      "data_scale": 1.0,
+      "capacity_scale": 0.7,
+      "makespan": 538,
+      "load_std": 581.9129144468268,
+      "deadline_violations": 24
+    },
+    {
+      "data_scale": 1.0,
+      "capacity_scale": 1.0,
+      "makespan": 402,
+      "load_std": 476.6229537065961,
+      "deadline_violations": 22
+    },
+    {
+      "data_scale": 1.0,
+      "capacity_scale": 1.4,
+      "makespan": 337,
+      "load_std": 594.9273569100685,
+      "deadline_violations": 19
+    },
+    {
+      "data_scale": 2.0,
+      "capacity_scale": 0.7,
+      "makespan": 940,
+      "load_std": 1298.1599285142026,
+      "deadline_violations": 30
+    },
+    {
+      "data_scale": 2.0,
+      "capacity_scale": 1.0,
+      "makespan": 675,
+      "load_std": 696.9781632160365,
+      "deadline_violations": 28
+    },
+    {
+      "data_scale": 2.0,
+      "capacity_scale": 1.4,
+      "makespan": 538,
+      "load_std": 581.9129144468268,
+      "deadline_violations": 24
+    }
+  ],
+  "dynamic_demo": {
+    "arriving_tasks": 12,
+    "failed_node": 4,
+    "reassigned_tasks": 2,
+    "initial_makespan": 325
+  },
+  "multi_objective": {
+    "formula": "0.55*makespan + 0.25*weighted_lateness + 0.20*load_std",
+    "status": "reporting-ready objective definition"
+  }
+}
