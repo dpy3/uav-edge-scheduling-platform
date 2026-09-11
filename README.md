@@ -136,3 +136,7 @@ docker compose -f compose.yml -f compose.deploy.yml up -d
 ## 技术栈
 
 Python 3.13、FastAPI、SQLModel、PostgreSQL、React、TypeScript、TanStack Query、Docker Compose、PyJobShop / OR-Tools、遗传算法。
+
+## 简历与面试材料
+
+项目职责、可引用实验结果和面试讲解顺序见 [`PROJECT_RESUME_ENTRY.md`](PROJECT_RESUME_ENTRY.md)。
